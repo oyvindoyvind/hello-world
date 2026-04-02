@@ -47,6 +47,8 @@
     .egg-icon { font-size: 52px; margin-bottom: 10px; }
     h1 { font-size: 24px; color: var(--primary-dark); margin-bottom: 4px; }
     .subtitle { font-size: 14px; color: var(--text-light); }
+    .intro { font-size: 14px; color: var(--text); line-height: 1.55; margin-bottom: 8px; font-style: italic; }
+    .intro-sign { font-weight: 600; margin-top: 4px; }
 
     .username-display {
       font-size: 13px;
@@ -315,7 +317,7 @@ const INDIVIDUAL_QUESTIONS = {
     {
       type: "text",
       question: "Finn neste svar ved :'Fikk det mørkt i vinter, og sprer nå glede til oss ALLE'",
-      answer: "Svar på spørsmål 1"
+      answer: "Svar på spørsmål 2"
     },
     {
       type: "text",
@@ -385,6 +387,10 @@ function renderUsername() {
       <div class="header">
         <div class="egg-icon">🐣</div>
         <h1>Påskeeggjakt!</h1>
+        <p class="intro">yeyeye! Trodde dere kunne slappe av i påsken?</p>
+        <p class="intro">Eggene mine er gjemt — og de gir seg ikke uten kamp. Svar riktig på spørsmål, og løs oppgavene, og kanskje, kanskje, avslører jeg hvor jeg har gjemt dem.</p>
+        <p class="intro">Lykke til. Dere trenger det.</p>
+        <p class="intro intro-sign">— Påskeharen 🐇</p>
         <p class="subtitle">Skriv inn brukernavnet ditt for å starte</p>
       </div>
       <div class="input-group">
