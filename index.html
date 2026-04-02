@@ -161,7 +161,7 @@
 const EGG_LOCATIONS = {
   fredrik: "Påskeegget ditt er gjemt under der du ikke liker å støvsuge, og Ayla ikke får sitte",
   aurora:  "Påskeegget ditt er gjemt blant hint og andre ting du ikke liker å tape",
-  marthe:  "Påskeegget ditt er gjemt godt. Men et hint til i 'Well that's italian'"
+  marthe:  "Påskeegget ditt er gjemt godt. 'Well that's italian'"
 };
 
 
@@ -207,7 +207,7 @@ const SHARED_QUESTIONS = [
   },
   {
     type: "text",
-    question: "traenot åp/i negnas sered ærejk raf tsetfo rennyn åp",
+    question: "traenot åp/i negnas sered ærejk raf relle etseræjk tsetfo rennyn åp",
     answers: ["md", "dm", "dmoll", "d-moll", "d moll"]
   }
 ];
@@ -218,9 +218,9 @@ const INDIVIDUAL_QUESTIONS = {
   fredrik: [
     {
       type: "multiple",
-      question: "Spørsmål 2 – Fredrik (flervalg)",
-      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
-      answer: "Alternativ B"
+      question: "Hvilket land startet 1. verdenskrig ved å erklære krig mot Serbia i 1914?",
+      options: ["Østerrike-Ungarn", "Tyskland", "Russland"],
+      answer: "Østerrike-Ungarn"
     },
     {
       type: "text",
@@ -230,8 +230,8 @@ const INDIVIDUAL_QUESTIONS = {
     },
     {
       type: "text",
-      question: "Hvem av disse er IKKE en tidligere Brann-helt",
-      options: ["Erik 'Myggen' Mykland", "Torstein Helstad", "Raymond Kvisvik", "Tore André Flo"],
+      question: "Hvem av disse er IKKE en tidligere Brann-spiller",
+      options: ["Erik 'Myggen' Mykland", "Torstein Helstad", "Tore André Flo", "Ruben Yttergård Jensen"],
       answer: "Erik 'Myggen' Mykland"
     },
     {
@@ -310,26 +310,28 @@ const INDIVIDUAL_QUESTIONS = {
 
   marthe: [
     {
-      type: "multiple",
-      question: "Spørsmål 2 – Marthe (flervalg)",
-      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
-      answer: "Alternativ A"
+      type: "text",
+      question: "Finn neste svar ved :'Fikk det mørkt i vinter, og sprer nå glede til oss ALLE'",
+      answer: "Svar på spørsmål 1"
     },
     {
       type: "text",
-      question: "Spørsmål 4 – Marthe",
-      answer: "Svar 4"
-    },
-    {
-      type: "multiple",
-      question: "Spørsmål 6 – Marthe (flervalg)",
-      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
-      answer: "Alternativ B"
+      question: "Hva heter han her?",
+      image: "pusen.jpg",
+      answer: "erik huseklepp"
     },
     {
       type: "text",
-      question: "Spørsmål 8 – Marthe",
-      answer: "Svar 8"
+      question: "Oppgave: mobiltelefon, høy fyr",
+      answer: "jens august"
+    },
+    {
+      type: "text",
+      question: "Nevn minst 6 deltakere på årets Boksen. Bare fornavn, og bruk mellomrom mellom navnene.",
+      answerMode: "alphabetical-subset",
+      minCount: 6,
+      validNames: ["benedicte", "frode", "morten", "tuva", "anette", "emil",
+                   "kasper", "margrete", "erik", "jon", "tomine", "sofie", "tim"]
     }
   ]
 };
@@ -516,10 +518,26 @@ function handleAnswerSubmit() {
 
   if (q.type === "text") {
     const userAns = state.inputValue.trim().toLowerCase();
-    const valid = q.answers
-      ? q.answers.map(a => a.trim().toLowerCase())
-      : [q.answer.trim().toLowerCase()];
-    correct = valid.includes(userAns);
+    if (q.answerMode === "alphabetical-subset") {
+      const words = userAns.split(/\s+/).filter(w => w.length > 0);
+      const validSet  = q.validNames.map(n => n.toLowerCase());
+      const unknown   = words.filter(w => !validSet.includes(w));
+      const noDupes   = new Set(words).size === words.length;
+      const enough    = words.length >= q.minCount;
+      if (unknown.length > 0) {
+        state.feedback = { type: "error", message: `Ukjent navn: ${unknown.join(", ")}. Sjekk stavingen!` };
+      } else if (!noDupes) {
+        state.feedback = { type: "error", message: "Du har oppgitt samme navn flere ganger!" };
+      } else if (!enough) {
+        state.feedback = { type: "error", message: `Du har oppgitt ${words.length} navn – du trenger minst ${q.minCount}!` };
+      }
+      correct = unknown.length === 0 && noDupes && enough;
+    } else {
+      const valid = q.answers
+        ? q.answers.map(a => a.trim().toLowerCase())
+        : [q.answer.trim().toLowerCase()];
+      correct = valid.includes(userAns);
+    }
   } else {
     correct = !!state.selectedOption &&
       state.selectedOption.trim().toLowerCase() === q.answer.trim().toLowerCase();
@@ -542,7 +560,7 @@ function handleAnswerSubmit() {
       state.awaitingCodeword = true;
       state.codewordInput = "";
       state.codewordFeedback = null;
-    } else {
+    } else if (!state.feedback) {
       state.feedback = { type: "error", message: "Feil svar, prøv igjen!" };
     }
   }
