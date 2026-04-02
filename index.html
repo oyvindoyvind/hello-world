@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Påskeeggjakt</title>
+  <style>
+    :root {
+      --bg: #fffbf0;
+      --card: #ffffff;
+      --primary: #e8a838;
+      --primary-dark: #c88a20;
+      --text: #3a2e1e;
+      --text-light: #7a6a4e;
+      --success: #4a8a4a;
+      --error: #c0392b;
+      --border: #e8d9b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    #app { width: 100%; max-width: 480px; }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+      border: 1px solid var(--border);
+    }
+
+    .header { text-align: center; margin-bottom: 24px; }
+    .egg-icon { font-size: 52px; margin-bottom: 10px; }
+    h1 { font-size: 24px; color: var(--primary-dark); margin-bottom: 4px; }
+    .subtitle { font-size: 14px; color: var(--text-light); }
+
+    .username-display {
+      font-size: 13px;
+      color: var(--text-light);
+      text-align: right;
+      margin-bottom: 12px;
+    }
+
+    .progress { margin-bottom: 20px; }
+    .progress-label { font-size: 13px; color: var(--text-light); margin-bottom: 6px; }
+    .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.4s ease; }
+
+    .question-text { font-size: 17px; font-weight: 600; line-height: 1.45; margin-bottom: 20px; }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      color: var(--text);
+      background: white;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus { border-color: var(--primary); }
+    input[type="text"]:disabled { background: #f8f4ec; color: #aaa; }
+
+    .input-group { display: flex; flex-direction: column; gap: 12px; }
+
+    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+    .option {
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 15px;
+      background: white;
+      text-align: left;
+      color: var(--text);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .option:hover:not(:disabled) { background: #fff8e8; border-color: var(--primary); }
+    .option.selected { background: #fef3d0; border-color: var(--primary); font-weight: 600; }
+    .option:disabled { cursor: not-allowed; opacity: 0.6; }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .feedback.error { background: #fdf0ef; color: var(--error); border: 1px solid #f5c6c2; }
+    .feedback.success { background: #f0f9f0; color: var(--success); border: 1px solid #b8e0b8; }
+
+    .codeword-section {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .codeword-section p { font-size: 14px; color: var(--text-light); margin-bottom: 12px; }
+
+    .final-card { text-align: center; }
+    .final-card .egg-icon { font-size: 64px; }
+    .final-card h2 { font-size: 26px; color: var(--primary-dark); margin-bottom: 10px; }
+    .final-card .lead { font-size: 15px; color: var(--text-light); }
+
+    .location-box {
+      background: #fff8e8;
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 20px 18px;
+      margin-top: 22px;
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--text);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+
+// ================================================================
+//  REDIGER HER (1/2) – Gjemmesteder, ett per bruker
+//  Skriv inn hvor hvert påskeegg er gjemt.
+// ================================================================
+const EGG_LOCATIONS = {
+  fredrik: "Påskeegget ditt er gjemt [sted for Fredrik]",
+  aurora:  "Påskeegget ditt er gjemt [sted for Aurora]",
+  marthe:  "Påskeegget ditt er gjemt [sted for Marthe]"
+};
+
+
+// ================================================================
+//  REDIGER HER (2/2) – Spørsmål og svar per bruker
+//
+//  Hver bruker har sin egen liste med 8 spørsmål.
+//
+//  type: "text"
+//    – Fritekst-svar. Ikke skiller mellom store/små bokstaver.
+//    – answer: det riktige svaret (tekst).
+//
+//  type: "multiple"
+//    – Flervalgssvar. Feil svar krever kodeordet "Påskeharen" for å prøve igjen.
+//    – options: liste med svaralternativer (tekst-array).
+//    – answer: nøyaktig tekst fra options-lista som er riktig svar.
+// ================================================================
+const QUESTIONS = {
+
+  fredrik: [
+    {
+      type: "text",
+      question: "Spørsmål 1 – Fredrik",
+      answer: "Svar 1"
+    },
+    {
+      type: "multiple",
+      question: "Spørsmål 2 – Fredrik (flervalg)",
+      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
+      answer: "Alternativ B"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 3 – Fredrik",
+      answer: "Svar 3"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 4 – Fredrik",
+      answer: "Svar 4"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 5 – Fredrik",
+      answer: "Svar 5"
+    },
+    {
+      type: "multiple",
+      question: "Spørsmål 6 – Fredrik (flervalg)",
+      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
+      answer: "Alternativ A"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 7 – Fredrik",
+      answer: "Svar 7"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 8 – Fredrik",
+      answer: "Svar 8"
+    }
+  ],
+
+  aurora: [
+    {
+      type: "text",
+      question: "Spørsmål 1 – Aurora",
+      answer: "Svar 1"
+    },
+    {
+      type: "multiple",
+      question: "Spørsmål 2 – Aurora (flervalg)",
+      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
+      answer: "Alternativ C"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 3 – Aurora",
+      answer: "Svar 3"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 4 – Aurora",
+      answer: "Svar 4"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 5 – Aurora",
+      answer: "Svar 5"
+    },
+    {
+      type: "multiple",
+      question: "Spørsmål 6 – Aurora (flervalg)",
+      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
+      answer: "Alternativ D"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 7 – Aurora",
+      answer: "Svar 7"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 8 – Aurora",
+      answer: "Svar 8"
+    }
+  ],
+
+  marthe: [
+    {
+      type: "text",
+      question: "Spørsmål 1 – Marthe",
+      answer: "Svar 1"
+    },
+    {
+      type: "multiple",
+      question: "Spørsmål 2 – Marthe (flervalg)",
+      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
+      answer: "Alternativ A"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 3 – Marthe",
+      answer: "Svar 3"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 4 – Marthe",
+      answer: "Svar 4"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 5 – Marthe",
+      answer: "Svar 5"
+    },
+    {
+      type: "multiple",
+      question: "Spørsmål 6 – Marthe (flervalg)",
+      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
+      answer: "Alternativ B"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 7 – Marthe",
+      answer: "Svar 7"
+    },
+    {
+      type: "text",
+      question: "Spørsmål 8 – Marthe",
+      answer: "Svar 8"
+    }
+  ]
+};
+
+
+// ================================================================
+//  APP-LOGIKK – ikke rediger nedenfor her
+// ================================================================
+
+const VALID_USERS = ["fredrik", "aurora", "marthe"];
+const CODEWORD    = "påskeharen";
+
+let state = {
+  screen: "username",
+  user: null,
+  questionIndex: 0,
+  inputValue: "",
+  selectedOption: null,
+  feedback: null,
+  awaitingCodeword: false,
+  codewordInput: "",
+  codewordFeedback: null
+};
+
+// ---- Render ----
+
+function render() {
+  const app = document.getElementById("app");
+  if (state.screen === "username")  app.innerHTML = renderUsername();
+  else if (state.screen === "question") app.innerHTML = renderQuestion();
+  else if (state.screen === "final")    app.innerHTML = renderFinal();
+  attachListeners();
+}
+
+function renderUsername() {
+  return `
+    <div class="card">
+      <div class="header">
+        <div class="egg-icon">🐣</div>
+        <h1>Påskeeggjakt!</h1>
+        <p class="subtitle">Skriv inn brukernavnet ditt for å starte</p>
+      </div>
+      <div class="input-group">
+        <input type="text" id="username-input" placeholder="Brukernavn"
+          autocomplete="off" autocorrect="off" autocapitalize="off"
+          value="${esc(state.inputValue)}">
+        <button class="btn btn-primary" id="username-btn">Start jakten →</button>
+      </div>
+      ${state.feedback ? feedback(state.feedback) : ""}
+    </div>`;
+}
+
+function renderQuestion() {
+  const q     = QUESTIONS[state.user][state.questionIndex];
+  const total = QUESTIONS[state.user].length;
+  const pct   = (state.questionIndex / total) * 100;
+  return `
+    <div class="card">
+      <div class="username-display">👤 ${esc(state.user)}</div>
+      <div class="progress">
+        <div class="progress-label">Spørsmål ${state.questionIndex + 1} av ${total}</div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%"></div>
+        </div>
+      </div>
+      <div class="question-text">${esc(q.question)}</div>
+      ${q.type === "text" ? renderTextQ() : renderMultipleQ(q)}
+      ${state.feedback ? feedback(state.feedback) : ""}
+      ${state.awaitingCodeword ? renderCodeword() : ""}
+    </div>`;
+}
+
+function renderTextQ() {
+  const locked = state.awaitingCodeword;
+  return `
+    <div class="input-group">
+      <input type="text" id="answer-input" placeholder="Ditt svar…"
+        autocomplete="off" autocorrect="off"
+        value="${esc(state.inputValue)}" ${locked ? "disabled" : ""}>
+      <button class="btn btn-primary" id="answer-btn" ${locked ? "disabled" : ""}>Svar →</button>
+    </div>`;
+}
+
+function renderMultipleQ(q) {
+  const locked = state.awaitingCodeword;
+  const opts = q.options.map(opt => `
+    <button class="option ${state.selectedOption === opt ? "selected" : ""}"
+      data-option="${esc(opt)}" ${locked ? "disabled" : ""}>
+      ${esc(opt)}
+    </button>`).join("");
+  return `
+    <div class="options">${opts}</div>
+    <button class="btn btn-primary" id="answer-btn"
+      ${!state.selectedOption || locked ? "disabled" : ""}>Svar →</button>`;
+}
+
+function renderCodeword() {
+  return `
+    <div class="codeword-section">
+      <p>🔒 Skriv inn kodeordet for å prøve igjen:</p>
+      <div class="input-group">
+        <input type="text" id="codeword-input" placeholder="Kodeord…"
+          autocomplete="off" autocorrect="off"
+          value="${esc(state.codewordInput)}">
+        <button class="btn btn-primary" id="codeword-btn">Lås opp</button>
+      </div>
+      ${state.codewordFeedback ? feedback(state.codewordFeedback) : ""}
+    </div>`;
+}
+
+function renderFinal() {
+  return `
+    <div class="card final-card">
+      <div class="egg-icon">🥚🐰🥚</div>
+      <h2>Gratulerer, ${esc(capitalize(state.user))}!</h2>
+      <p class="lead">Du har fullført påskeeggjakt!</p>
+      <div class="location-box">🗺️ ${esc(EGG_LOCATIONS[state.user])}</div>
+    </div>`;
+}
+
+function feedback(f) {
+  return `<div class="feedback ${f.type}">${f.message}</div>`;
+}
+
+// ---- Event listeners ----
+
+function attachListeners() {
+  on("username-btn", "click", handleUsernameSubmit);
+  onInput("username-input", v => { state.inputValue = v; });
+  onEnter("username-input", handleUsernameSubmit);
+  focusIfPresent("username-input");
+
+  on("answer-btn", "click", handleAnswerSubmit);
+  onInput("answer-input", v => { state.inputValue = v; });
+  onEnter("answer-input", handleAnswerSubmit);
+  focusIfPresent("answer-input");
+
+  document.querySelectorAll(".option").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (state.awaitingCodeword) return;
+      state.selectedOption = btn.dataset.option;
+      state.feedback = null;
+      render();
+    });
+  });
+
+  on("codeword-btn", "click", handleCodewordSubmit);
+  onInput("codeword-input", v => { state.codewordInput = v; });
+  onEnter("codeword-input", handleCodewordSubmit);
+  focusIfPresent("codeword-input");
+}
+
+// ---- Handlers ----
+
+function handleUsernameSubmit() {
+  const val = state.inputValue.trim().toLowerCase();
+  if (!val) return;
+  if (!VALID_USERS.includes(val)) {
+    state.feedback = { type: "error", message: "Ukjent brukernavn. Prøv igjen!" };
+    render();
+    return;
+  }
+  Object.assign(state, {
+    user: val, screen: "question", questionIndex: 0,
+    inputValue: "", feedback: null
+  });
+  render();
+}
+
+function handleAnswerSubmit() {
+  const q = QUESTIONS[state.user][state.questionIndex];
+  let correct = false;
+
+  if (q.type === "text") {
+    correct = state.inputValue.trim().toLowerCase() === q.answer.trim().toLowerCase();
+  } else {
+    correct = !!state.selectedOption &&
+      state.selectedOption.trim().toLowerCase() === q.answer.trim().toLowerCase();
+  }
+
+  if (correct) {
+    const total = QUESTIONS[state.user].length;
+    if (state.questionIndex + 1 >= total) {
+      state.screen = "final";
+    } else {
+      Object.assign(state, {
+        questionIndex: state.questionIndex + 1,
+        inputValue: "", selectedOption: null, feedback: null,
+        awaitingCodeword: false, codewordInput: "", codewordFeedback: null
+      });
+    }
+  } else {
+    if (q.type === "multiple") {
+      state.feedback = { type: "error", message: "Feil svar! Skriv inn kodeordet for å prøve igjen." };
+      state.awaitingCodeword = true;
+      state.codewordInput = "";
+      state.codewordFeedback = null;
+    } else {
+      state.feedback = { type: "error", message: "Feil svar, prøv igjen!" };
+    }
+  }
+  render();
+}
+
+function handleCodewordSubmit() {
+  if (state.codewordInput.trim().toLowerCase() === CODEWORD) {
+    Object.assign(state, {
+      awaitingCodeword: false, feedback: null,
+      selectedOption: null, codewordInput: "", codewordFeedback: null
+    });
+  } else {
+    state.codewordFeedback = { type: "error", message: "Feil kodeord, prøv igjen!" };
+  }
+  render();
+}
+
+// ---- Helpers ----
+
+function on(id, ev, fn)      { const el = document.getElementById(id); if (el) el.addEventListener(ev, fn); }
+function onInput(id, fn)     { on(id, "input", e => fn(e.target.value)); }
+function onEnter(id, fn)     { on(id, "keydown", e => { if (e.key === "Enter") fn(); }); }
+function focusIfPresent(id)  { const el = document.getElementById(id); if (el) el.focus(); }
+function capitalize(s)       { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+function esc(str) {
+  if (!str) return "";
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+render();
+</script>
+</body>
+</html>
