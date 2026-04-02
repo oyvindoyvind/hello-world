@@ -371,14 +371,51 @@ let state = {
   codewordFeedback: null
 };
 
+// Tidligste tidspunkt jakten åpner – norsk tid (CEST = UTC+2)
+const OPENS_AT = new Date("2026-04-03T09:00:00+02:00");
+
 // ---- Render ----
 
 function render() {
   const app = document.getElementById("app");
+  if (new Date() < OPENS_AT) {
+    app.innerHTML = renderNotYetOpen();
+    scheduleReopenCheck();
+    return;
+  }
   if (state.screen === "username")  app.innerHTML = renderUsername();
   else if (state.screen === "question") app.innerHTML = renderQuestion();
   else if (state.screen === "final")    app.innerHTML = renderFinal();
   attachListeners();
+}
+
+function renderNotYetOpen() {
+  const diff = OPENS_AT - new Date();
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  const pad = n => String(n).padStart(2, "0");
+  return `
+    <div class="card" style="text-align:center">
+      <div class="egg-icon">🥚</div>
+      <h1 style="margin-bottom:12px">Ikke ennå!</h1>
+      <p class="intro">Påskeharen sover fortsatt.</p>
+      <p class="intro">Jakten åpner <strong>3. april kl. 09:00</strong>.</p>
+      <p class="intro intro-sign">— Påskeharen 🐇</p>
+      <div style="margin-top:20px;font-size:32px;font-weight:700;letter-spacing:2px;color:var(--primary-dark)">
+        ${pad(h)}:${pad(m)}:${pad(s)}
+      </div>
+      <p style="font-size:12px;color:var(--text-light);margin-top:6px">tid igjen</p>
+    </div>`;
+}
+
+let _reopenTimer = null;
+function scheduleReopenCheck() {
+  if (_reopenTimer) return;
+  _reopenTimer = setInterval(() => {
+    if (new Date() >= OPENS_AT) { clearInterval(_reopenTimer); _reopenTimer = null; }
+    render();
+  }, 1000);
 }
 
 function renderUsername() {
