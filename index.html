@@ -191,24 +191,24 @@ const EGG_LOCATIONS = {
 const SHARED_QUESTIONS = [
   {
     type: "text",
-    question: "Spørsmål 1 – Felles",
-    answer: "Svar 1",
+    question: "Hva kan man kalle dette",
+    answer: "lestepådei",
     image: "leverpostei.jpg"
   },
   {
-    type: "text",
-    question: "Spørsmål 3 – Felles",
+    type: "Hva heter den siste norske herrespilleren SK Brann har signert?",
+    question: "Kristian Eriksen",
     answer: "Svar 3"
   },
   {
     type: "text",
-    question: "Spørsmål 5 – Felles",
-    answer: "Svar 5"
+    question: "23.03. - 04.04. - 15.04. - 03.05. - ??.??",
+    answer: "16.05."
   },
   {
     type: "text",
-    question: "Spørsmål 7 – Felles",
-    answer: "Svar 7"
+    question: "traenot åp/i negnas sered ærejk raf tsetfo rennyn åp",
+    answers: ["md", "dm", "dmoll", "d-moll", "d moll"]
   }
 ];
 
@@ -224,44 +224,87 @@ const INDIVIDUAL_QUESTIONS = {
     },
     {
       type: "text",
-      question: "Spørsmål 4 – Fredrik",
-      answer: "Svar 4"
-    },
-    {
-      type: "multiple",
-      question: "Spørsmål 6 – Fredrik (flervalg)",
-      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
-      answer: "Alternativ A"
+      question: "Hvem er dette? (fornavn)",
+      answer: "Sivert",
+      image: "sivert.jpg"
     },
     {
       type: "text",
-      question: "Spørsmål 8 – Fredrik",
-      answer: "Svar 8"
+      question: "Hvem av disse er IKKE en tidligere Brann-helt",
+      options: ["Erik 'Myggen' Mykland", "Torstein Helstad", "Raymond Kvisvik", "Tore André Flo"],
+      answer: "Erik 'Myggen' Mykland"
+    },
+    {
+      type: "text",
+      question: "Well, baby, I'm a put-on-a-show kinda girl",
+      answers: [
+        "don't like the backseat, gotta be first",
+        "dont like the backseat, gotta be first",
+        "don't like the backseat gotta be first",
+        "dont like the backseat gotta be first",
+        "don't like the back seat, gotta be first",
+        "dont like the back seat gotta be first",
+        "don't like the backseat, gotta be the first",
+        "don't like the backseat, got to be first",
+        "dont like the backseat got to be first",
+        "don't like backseat gotta be first",
+        "don't like the backseet, gotta be first",
+        "dont like the backseet gotta be first"
+      ]
     }
   ],
 
   aurora: [
     {
-      type: "multiple",
-      question: "Spørsmål 2 – Aurora (flervalg)",
-      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
-      answer: "Alternativ C"
+      type: "text",
+      question: "Hvilket av disse landene grenser ikke til Tyskland?",
+      options: ["Belgia", "Sveits", "Luxembourg", "Italia"],
+      answer: "Italia"
     },
     {
       type: "text",
-      question: "Spørsmål 4 – Aurora",
-      answer: "Svar 4"
-    },
-    {
-      type: "multiple",
-      question: "Spørsmål 6 – Aurora (flervalg)",
-      options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
-      answer: "Alternativ D"
+      question: "Come Shine - Saga of Harrison Crabfeathers - hvilken taktart?",
+      answers: [
+        "68",
+        "6 8",
+        "6/8",
+        "6 over 8"        
+      ]
     },
     {
       type: "text",
-      question: "Spørsmål 8 – Aurora",
-      answer: "Svar 8"
+      question: "Hva heter sønnene til Torbjørn og Tine?",
+      answers: [
+        "helge inge eirik øystein",   "helge, inge, eirik, øystein",
+        "helge inge øystein eirik",   "helge, inge, øystein, eirik",
+        "helge eirik inge øystein",   "helge, eirik, inge, øystein",
+        "helge eirik øystein inge",   "helge, eirik, øystein, inge",
+        "helge øystein inge eirik",   "helge, øystein, inge, eirik",
+        "helge øystein eirik inge",   "helge, øystein, eirik, inge",
+        "inge helge eirik øystein",   "inge, helge, eirik, øystein",
+        "inge helge øystein eirik",   "inge, helge, øystein, eirik",
+        "inge eirik helge øystein",   "inge, eirik, helge, øystein",
+        "inge eirik øystein helge",   "inge, eirik, øystein, helge",
+        "inge øystein helge eirik",   "inge, øystein, helge, eirik",
+        "inge øystein eirik helge",   "inge, øystein, eirik, helge",
+        "eirik helge inge øystein",   "eirik, helge, inge, øystein",
+        "eirik helge øystein inge",   "eirik, helge, øystein, inge",
+        "eirik inge helge øystein",   "eirik, inge, helge, øystein",
+        "eirik inge øystein helge",   "eirik, inge, øystein, helge",
+        "eirik øystein helge inge",   "eirik, øystein, helge, inge",
+        "eirik øystein inge helge",   "eirik, øystein, inge, helge",
+        "øystein helge inge eirik",   "øystein, helge, inge, eirik",
+        "øystein helge eirik inge",   "øystein, helge, eirik, inge",
+        "øystein inge helge eirik",   "øystein, inge, helge, eirik",
+        "øystein inge eirik helge",   "øystein, inge, eirik, helge",
+        "øystein eirik helge inge",   "øystein, eirik, helge, inge",
+        "øystein eirik inge helge",   "øystein, eirik, inge, helge"
+      ]
+    },
+    {
+      type: "text",
+      question: "Bak kos med stor aldersforskjell i stuen",
+      answer: "Svar på spørsmål 8"
     }
   ],
 
@@ -472,7 +515,11 @@ function handleAnswerSubmit() {
   let correct = false;
 
   if (q.type === "text") {
-    correct = state.inputValue.trim().toLowerCase() === q.answer.trim().toLowerCase();
+    const userAns = state.inputValue.trim().toLowerCase();
+    const valid = q.answers
+      ? q.answers.map(a => a.trim().toLowerCase())
+      : [q.answer.trim().toLowerCase()];
+    correct = valid.includes(userAns);
   } else {
     correct = !!state.selectedOption &&
       state.selectedOption.trim().toLowerCase() === q.answer.trim().toLowerCase();
