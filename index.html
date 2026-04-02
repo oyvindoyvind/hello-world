@@ -59,6 +59,14 @@
 
     .question-text { font-size: 17px; font-weight: 600; line-height: 1.45; margin-bottom: 20px; }
 
+    .question-image { text-align: center; margin-bottom: 16px; }
+    .question-image img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
     input[type="text"] {
       width: 100%;
       padding: 14px 16px;
@@ -151,16 +159,18 @@
 //  Skriv inn hvor hvert påskeegg er gjemt.
 // ================================================================
 const EGG_LOCATIONS = {
-  fredrik: "Påskeegget ditt er gjemt [sted for Fredrik]",
-  aurora:  "Påskeegget ditt er gjemt [sted for Aurora]",
-  marthe:  "Påskeegget ditt er gjemt [sted for Marthe]"
+  fredrik: "Påskeegget ditt er gjemt under der du ikke liker å støvsuge, og Ayla ikke får sitte",
+  aurora:  "Påskeegget ditt er gjemt blant hint og andre ting du ikke liker å tape",
+  marthe:  "Påskeegget ditt er gjemt godt. Men et hint til i 'Well that's italian'"
 };
 
 
 // ================================================================
-//  REDIGER HER (2/2) – Spørsmål og svar per bruker
+//  REDIGER HER (2/2) – Spørsmål og svar
 //
-//  Hver bruker har sin egen liste med 8 spørsmål.
+//  FELLES spørsmål (1, 3, 5, 7) vises til alle brukere.
+//  INDIVIDUELLE spørsmål (2, 4, 6, 8) vises kun til én bruker.
+//  Rekkefølgen blir automatisk: Felles→Individuell→Felles→Individuell...
 //
 //  type: "text"
 //    – Fritekst-svar. Ikke skiller mellom store/små bokstaver.
@@ -170,15 +180,42 @@ const EGG_LOCATIONS = {
 //    – Flervalgssvar. Feil svar krever kodeordet "Påskeharen" for å prøve igjen.
 //    – options: liste med svaralternativer (tekst-array).
 //    – answer: nøyaktig tekst fra options-lista som er riktig svar.
+//
+//  image: (valgfritt) filnavn på bilde som vises over spørsmålet.
+//    – Legg bildefilen i samme mappe som index.html, og skriv bare filnavnet.
+//    – Eksempel:  image: "leverpostei.jpg"
+//    – Fjern linjen (eller sett image: null) for å ikke vise bilde.
 // ================================================================
-const QUESTIONS = {
+
+// Spørsmål 1, 3, 5, 7 – vises til alle
+const SHARED_QUESTIONS = [
+  {
+    type: "text",
+    question: "Spørsmål 1 – Felles",
+    answer: "Svar 1",
+    image: "leverpostei.jpg"
+  },
+  {
+    type: "text",
+    question: "Spørsmål 3 – Felles",
+    answer: "Svar 3"
+  },
+  {
+    type: "text",
+    question: "Spørsmål 5 – Felles",
+    answer: "Svar 5"
+  },
+  {
+    type: "text",
+    question: "Spørsmål 7 – Felles",
+    answer: "Svar 7"
+  }
+];
+
+// Spørsmål 2, 4, 6, 8 – individuelle per bruker
+const INDIVIDUAL_QUESTIONS = {
 
   fredrik: [
-    {
-      type: "text",
-      question: "Spørsmål 1 – Fredrik",
-      answer: "Svar 1"
-    },
     {
       type: "multiple",
       question: "Spørsmål 2 – Fredrik (flervalg)",
@@ -187,29 +224,14 @@ const QUESTIONS = {
     },
     {
       type: "text",
-      question: "Spørsmål 3 – Fredrik",
-      answer: "Svar 3"
-    },
-    {
-      type: "text",
       question: "Spørsmål 4 – Fredrik",
       answer: "Svar 4"
-    },
-    {
-      type: "text",
-      question: "Spørsmål 5 – Fredrik",
-      answer: "Svar 5"
     },
     {
       type: "multiple",
       question: "Spørsmål 6 – Fredrik (flervalg)",
       options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
       answer: "Alternativ A"
-    },
-    {
-      type: "text",
-      question: "Spørsmål 7 – Fredrik",
-      answer: "Svar 7"
     },
     {
       type: "text",
@@ -220,11 +242,6 @@ const QUESTIONS = {
 
   aurora: [
     {
-      type: "text",
-      question: "Spørsmål 1 – Aurora",
-      answer: "Svar 1"
-    },
-    {
       type: "multiple",
       question: "Spørsmål 2 – Aurora (flervalg)",
       options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
@@ -232,29 +249,14 @@ const QUESTIONS = {
     },
     {
       type: "text",
-      question: "Spørsmål 3 – Aurora",
-      answer: "Svar 3"
-    },
-    {
-      type: "text",
       question: "Spørsmål 4 – Aurora",
       answer: "Svar 4"
-    },
-    {
-      type: "text",
-      question: "Spørsmål 5 – Aurora",
-      answer: "Svar 5"
     },
     {
       type: "multiple",
       question: "Spørsmål 6 – Aurora (flervalg)",
       options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
       answer: "Alternativ D"
-    },
-    {
-      type: "text",
-      question: "Spørsmål 7 – Aurora",
-      answer: "Svar 7"
     },
     {
       type: "text",
@@ -265,11 +267,6 @@ const QUESTIONS = {
 
   marthe: [
     {
-      type: "text",
-      question: "Spørsmål 1 – Marthe",
-      answer: "Svar 1"
-    },
-    {
       type: "multiple",
       question: "Spørsmål 2 – Marthe (flervalg)",
       options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
@@ -277,29 +274,14 @@ const QUESTIONS = {
     },
     {
       type: "text",
-      question: "Spørsmål 3 – Marthe",
-      answer: "Svar 3"
-    },
-    {
-      type: "text",
       question: "Spørsmål 4 – Marthe",
       answer: "Svar 4"
-    },
-    {
-      type: "text",
-      question: "Spørsmål 5 – Marthe",
-      answer: "Svar 5"
     },
     {
       type: "multiple",
       question: "Spørsmål 6 – Marthe (flervalg)",
       options: ["Alternativ A", "Alternativ B", "Alternativ C", "Alternativ D"],
       answer: "Alternativ B"
-    },
-    {
-      type: "text",
-      question: "Spørsmål 7 – Marthe",
-      answer: "Svar 7"
     },
     {
       type: "text",
@@ -313,6 +295,16 @@ const QUESTIONS = {
 // ================================================================
 //  APP-LOGIKK – ikke rediger nedenfor her
 // ================================================================
+
+// Fletter felles og individuelle spørsmål: [F1, I1, F2, I2, F3, I3, F4, I4]
+function getQuestions(user) {
+  const result = [];
+  for (let i = 0; i < SHARED_QUESTIONS.length; i++) {
+    result.push(SHARED_QUESTIONS[i]);
+    result.push(INDIVIDUAL_QUESTIONS[user][i]);
+  }
+  return result;
+}
 
 const VALID_USERS = ["fredrik", "aurora", "marthe"];
 const CODEWORD    = "påskeharen";
@@ -358,8 +350,8 @@ function renderUsername() {
 }
 
 function renderQuestion() {
-  const q     = QUESTIONS[state.user][state.questionIndex];
-  const total = QUESTIONS[state.user].length;
+  const q     = getQuestions(state.user)[state.questionIndex];
+  const total = getQuestions(state.user).length;
   const pct   = (state.questionIndex / total) * 100;
   return `
     <div class="card">
@@ -370,6 +362,7 @@ function renderQuestion() {
           <div class="progress-fill" style="width:${pct}%"></div>
         </div>
       </div>
+      ${q.image ? `<div class="question-image"><img src="${esc(q.image)}" alt=""></div>` : ""}
       <div class="question-text">${esc(q.question)}</div>
       ${q.type === "text" ? renderTextQ() : renderMultipleQ(q)}
       ${state.feedback ? feedback(state.feedback) : ""}
@@ -475,7 +468,7 @@ function handleUsernameSubmit() {
 }
 
 function handleAnswerSubmit() {
-  const q = QUESTIONS[state.user][state.questionIndex];
+  const q = getQuestions(state.user)[state.questionIndex];
   let correct = false;
 
   if (q.type === "text") {
@@ -486,7 +479,7 @@ function handleAnswerSubmit() {
   }
 
   if (correct) {
-    const total = QUESTIONS[state.user].length;
+    const total = getQuestions(state.user).length;
     if (state.questionIndex + 1 >= total) {
       state.screen = "final";
     } else {
